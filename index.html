@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Promptr</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Promptr">
+  <link rel="apple-touch-icon" href="icon.svg">
+</head>
+<body class="setup-page">
+
+<!-- Firebase Setup (first-time only) -->
+<div id="firebase-setup" class="screen hidden">
+  <div style="max-width:520px;margin:0 auto;padding:24px 20px 60px;">
+    <div class="setup-header">
+      <h1>Setup Promptr</h1>
+      <p class="subtitle">One-time Firebase setup &mdash; takes 5 minutes, free forever.</p>
+    </div>
+
+    <div class="instructions" style="margin-bottom:24px;">
+      <ol>
+        <li>Open <a href="https://console.firebase.google.com" target="_blank" rel="noopener">console.firebase.google.com</a></li>
+        <li>Create a new project (any name)</li>
+        <li>Click <strong>Web</strong> to add a web app, copy the config values below</li>
+        <li>Go to <strong>Build &rarr; Realtime Database &rarr; Create database &rarr; Test mode</strong></li>
+        <li>Paste values and save</li>
+      </ol>
+    </div>
+
+    <form id="firebase-form" class="firebase-setup-form">
+      <div class="field-group">
+        <label>API Key</label>
+        <input id="fb-apiKey" type="text" placeholder="AIzaSy..." autocomplete="off" required>
+      </div>
+      <div class="field-group">
+        <label>Auth Domain</label>
+        <input id="fb-authDomain" type="text" placeholder="your-project.firebaseapp.com" autocomplete="off" required>
+      </div>
+      <div class="field-group">
+        <label>Database URL</label>
+        <input id="fb-databaseURL" type="text" placeholder="https://your-project-default-rtdb.firebaseio.com" autocomplete="off" required>
+      </div>
+      <div class="field-group">
+        <label>Project ID</label>
+        <input id="fb-projectId" type="text" placeholder="your-project-id" autocomplete="off" required>
+      </div>
+      <div class="field-group">
+        <label>App ID</label>
+        <input id="fb-appId" type="text" placeholder="1:123456789:web:abc..." autocomplete="off" required>
+      </div>
+      <div class="form-footer">
+        <button type="submit" class="btn-primary">Save &amp; Continue</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Main App Screen -->
+<div id="main-screen" class="screen hidden">
+  <div id="main-content" style="max-width:520px;margin:0 auto;padding:0 16px 60px;">
+
+    <div class="app-header">
+      <h1 class="app-title">Promptr</h1>
+      <button id="reconfigure-btn" class="btn-icon" title="Firebase settings" style="font-size:18px;">&#9881;</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="new">New Session</button>
+      <button class="tab" data-tab="join">Join Session</button>
+    </div>
+
+    <!-- New Session -->
+    <div id="tab-new" class="tab-content">
+      <div class="room-code-row">
+        <span class="room-code-label">Room Code</span>
+        <span id="room-code" class="room-code-value">----</span>
+        <button id="new-code-btn" class="btn-small">Refresh</button>
+      </div>
+
+      <div class="field-group">
+        <label>Script <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;">&mdash; use <code>---</code> on its own line to separate sections</span></label>
+        <textarea id="script-input" placeholder="Paste your teleprompter script here.
+
+Use --- on its own line to divide into sections for Slide mode."></textarea>
+      </div>
+
+      <div class="action-buttons">
+        <button id="open-prompter-btn" class="btn-primary">
+          Open Prompter
+          <span class="btn-sub">Display device (Android)</span>
+        </button>
+        <button id="open-remote-btn" class="btn-secondary">
+          Open Remote
+          <span class="btn-sub">Controller (iPhone)</span>
+        </button>
+      </div>
+
+      <div class="share-section">
+        <p>Share this link so another device can open the Remote directly:</p>
+        <div class="copy-row">
+          <input id="remote-link" type="text" readonly>
+          <button id="copy-link-btn" class="btn-small">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Join Session -->
+    <div id="tab-join" class="tab-content hidden">
+      <div class="info-box" style="margin-bottom:20px;">
+        <strong>Joining someone else&rsquo;s session?</strong><br>
+        Ask them for their 4-letter room code, enter it below, then open as Prompter or Remote.
+      </div>
+
+      <div class="field-group">
+        <label>Room Code</label>
+        <input id="join-code-input" class="code-input" type="text" maxlength="4" placeholder="ABCD" autocomplete="off" autocapitalize="characters">
+      </div>
+
+      <div class="action-buttons">
+        <button id="join-prompter-btn" class="btn-primary">
+          Join as Prompter
+        </button>
+        <button id="join-remote-btn" class="btn-secondary">
+          Join as Remote
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module" src="js/index.js"></script>
+</body>
+</html>

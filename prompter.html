@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Promptr &mdash; Display</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Promptr">
+</head>
+<body class="is-prompter">
+
+<!-- Top bar (auto-hides after 4s of no touch) -->
+<div class="prompter-bar" id="prompter-bar">
+  <span class="room-pill" id="bar-room">----</span>
+  <span class="status-dot" id="status-dot"></span>
+  <span style="font-size:12px;color:rgba(255,255,255,0.5);" id="status-label">Connecting&hellip;</span>
+  <div class="prompter-bar-actions">
+    <button class="ctrl-btn" id="fullscreen-btn">&#x26F6; Full</button>
+    <button class="ctrl-btn" id="home-btn">&#8592; Setup</button>
+  </div>
+</div>
+
+<!-- Highlight guide bar -->
+<div class="highlight-bar" id="highlight-bar">
+  <div class="highlight-bar-inner"></div>
+</div>
+
+<!-- Connecting overlay -->
+<div class="prompter-overlay" id="prompter-overlay">
+  <div class="spinner"></div>
+  <h2>Waiting for Remote</h2>
+  <p>Open the Remote on your controller device<br>and enter this code:</p>
+  <div class="room-pill-lg" id="overlay-room">----</div>
+  <p style="margin-top:8px;font-size:13px;color:var(--text-muted);">Or share the link from the Setup page.</p>
+</div>
+
+<!-- Script display -->
+<div class="script-wrap" id="script-wrap">
+  <div class="script-content" id="script-content"></div>
+</div>
+
+<!-- Scroll progress bar -->
+<div class="scroll-progress" id="scroll-progress" style="width:0%"></div>
+
+<script type="module" src="js/prompter.js"></script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Promptr &mdash; Remote</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Promptr Remote">
+</head>
+<body class="is-remote">
+
+<!-- Sticky header -->
+<div class="remote-header">
+  <span class="remote-header title">Remote</span>
+  <span class="room-pill" id="header-room">----</span>
+  <span class="remote-header status-label">
+    <span class="status-dot" id="status-dot"></span>
+    <span id="status-text">Connecting</span>
+  </span>
+  <a href="index.html" style="margin-left:auto;font-size:12px;color:var(--text-muted);">&#8592; Setup</a>
+</div>
+
+<!-- Play / Pause -->
+<div class="play-section">
+  <button class="play-btn paused" id="play-btn">
+    <span id="play-icon">&#9654;</span>
+    <span id="play-label">Play</span>
+  </button>
+</div>
+
+<div class="control-section">
+
+  <!-- Scroll Mode -->
+  <div class="card">
+    <div class="card-header" data-toggle="mode-body">
+      <h3>Scroll Mode</h3>
+      <span class="chevron">&#8250;</span>
+    </div>
+    <div class="card-body" id="mode-body">
+      <div class="seg-control">
+        <button class="seg-btn active" data-mode="auto">Auto</button>
+        <button class="seg-btn" data-mode="manual">Manual</button>
+        <button class="seg-btn" data-mode="slide">Slide</button>
+      </div>
+      <div class="info-box" id="mode-hint" style="font-size:12px;">
+        <strong>Auto:</strong> Continuous scroll at set speed.
+      </div>
+    </div>
+  </div>
+
+  <!-- Speed (auto mode) -->
+  <div class="card" id="card-speed">
+    <div class="card-header" data-toggle="speed-body">
+      <h3>Speed</h3>
+      <span class="chevron">&#8250;</span>
+    </div>
+    <div class="card-body" id="speed-body">
+      <div class="slider-row">
+        <div class="slider-row-label">
+          <span>Scroll Speed</span>
+          <span class="val" id="speed-val">35</span>
+        </div>
+        <div class="slider-with-btns">
+          <button class="nudge-btn" id="speed-down">&#8722;</button>
+          <input type="range" id="speed-slider" min="1" max="100" value="35">
+          <button class="nudge-btn" id="speed-up">+</button>
+        </div>
+      </div>
+
+      <!-- Precision nudge during playback -->
+      <div id="precision-row" style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-small" id="slower-btn" style="flex:1;min-height:44px;">&#9665; Slower</button>
+        <button class="btn-small" id="faster-btn" style="flex:1;min-height:44px;">Faster &#9655;</button>
+        <button class="btn-small" id="restart-btn" style="flex:1;min-height:44px;">&#8635; Restart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manual Position (manual mode) -->
+  <div class="card hidden" id="card-position">
+    <div class="card-header" data-toggle="position-body">
+      <h3>Scroll Position</h3>
+      <span class="chevron">&#8250;</span>
+    </div>
+    <div class="card-body" id="position-body">
+      <div class="slider-row">
+        <div class="slider-row-label">
+          <span>Position</span>
+          <span class="val" id="position-val">0%</span>
+        </div>
+        <div class="slider-with-btns">
+          <button class="nudge-btn" id="pos-back">&laquo;</button>
+          <input type="range" id="position-slider" min="0" max="100" value="0">
+          <button class="nudge-btn" id="pos-fwd">&raquo;</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-small" id="pos-restart" style="flex:1;min-height:44px;">&#8635; Top</button>
+        <button class="btn-small" id="pos-end" style="flex:1;min-height:44px;">Bottom &#8595;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide navigation (slide mode) -->
+  <div class="card hidden" id="card-slides">
+    <div class="card-header" data-toggle="slides-body">
+      <h3>Sections</h3>
+      <span class="chevron">&#8250;</span>
+    </div>
+    <div class="card-body" id="slides-body">
+      <div class="slide-nav">
+        <button class="slide-nav-btn" id="prev-slide">&larr; Prev</button>
+        <div class="slide-counter">
+          <div id="slide-num" style="font-size:20px;font-weight:700;">1</div>
+          <div id="slide-total" style="font-size:12px;color:var(--text-muted);">of --</div>
+        </div>
+        <button class="slide-nav-btn" id="next-slide">Next &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Font Size -->
+  <div class="card">
+    <div class="card-header" data-toggle="font-body">
+      <h3>Font Size</h3>
+      <span class="chevron">&#8250;</span>
+    </div>
+    <div class="card-body" id="font-body">
+      <div class="slider-row">
+        <div class="slider-row-label">
+          <span>Size</span>
+          <span class="val" id="size-val">36px</span>
+        </div>
+        <div class="slider-with-btns">
+          <button class="nudge-btn" id="size-down">A&#8722;</button>
+          <input type="range" id="size-slider" min="18" max="90" value="36" step="2">
+          <button class="nudge-btn" id="size-up">A+</button>
+        </div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-row-label">
+          <span>Line Height</span>
+          <span class="val" id="lh-val">1.8</span>
+        </div>
+        <input type="range" id="lh-slider" min="1.2" max="2.8" value="1.8" step="0.1">
+      </div>
+    </div>
+  </div>
+
+  <!-- Font Family -->
+  <div class="card">
+    <div class="card-header" data-toggle="family-body">
+      <h3>Font Style</h3>
+      <span class="chevron">&#8250;</span>
+    </div>
+    <div class="card-body" id="family-body">
+      <div class="font-picker">
+        <button class="font-opt active" data-font="sans" style="font-family:Arial,sans-serif;">Sans</button>
+        <button class="font-opt" data-font="serif" style="font-family:Georgia,serif;">Serif</button>
+        <button class="font-opt" data-font="mono" style="font-family:'Courier New',monospace;">Mono</button>
+        <button class="font-opt" data-font="bold" style="font-family:'Arial Black',sans-serif;font-weight:900;">Bold</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Colors -->
+  <div class="card">
+    <div class="card-header" data-toggle="color-body">
+      <h3>Colors</h3>
+      <span class="chevron">&#8250;</span>
+    </div>
+    <div class="card-body" id="color-body">
+      <div class="color-row">
+        <div class="color-field">
+          <label>Text</label>
+          <input type="color" id="text-color" value="#ffffff">
+        </div>
+        <div class="color-field">
+          <label>Background</label>
+          <input type="color" id="bg-color" value="#000000">
+        </div>
+      </div>
+
+      <!-- Quick presets -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-small preset-btn" data-text="#ffffff" data-bg="#000000" style="flex:1;min-height:40px;background:#000;color:#fff;border:1px solid #333;">White / Black</button>
+        <button class="btn-small preset-btn" data-text="#000000" data-bg="#ffffff" style="flex:1;min-height:40px;background:#fff;color:#000;">Black / White</button>
+        <button class="btn-small preset-btn" data-text="#ffff00" data-bg="#000000" style="flex:1;min-height:40px;background:#000;color:#ff0;">Yellow / Black</button>
+        <button class="btn-small preset-btn" data-text="#00ff88" data-bg="#001a00" style="flex:1;min-height:40px;background:#001a00;color:#0f8;">Green</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Display Options -->
+  <div class="card">
+    <div class="card-header" data-toggle="display-body">
+      <h3>Display Options</h3>
+      <span class="chevron">&#8250;</span>
+    </div>
+    <div class="card-body" id="display-body">
+      <label class="toggle-row">
+        <span>Highlight Guide Bar</span>
+        <span class="toggle">
+          <input type="checkbox" id="highlight-toggle" checked>
+          <span class="toggle-track"></span>
+        </span>
+      </label>
+      <label class="toggle-row">
+        <span>Mirror Mode (teleprompter glass)</span>
+        <span class="toggle">
+          <input type="checkbox" id="mirror-toggle">
+          <span class="toggle-track"></span>
+        </span>
+      </label>
+    </div>
+  </div>
+
+</div><!-- /control-section -->
+
+<div id="toast"></div>
+
+<script type="module" src="js/remote.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "Promptr Teleprompter",
+  "short_name": "Promptr",
+  "description": "Web-based teleprompter controlled from any device",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity"]
+}
