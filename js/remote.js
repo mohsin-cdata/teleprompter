@@ -31,7 +31,6 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
 // ── State cache ───────────────────────────────────────────────────
 let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
 let totalSections = 1;
-let isSyncing = false;
 
 // ── DOM ───────────────────────────────────────────────────────────
 const statusDot   = document.getElementById('status-dot');
@@ -70,16 +69,12 @@ function toast(msg) {
 }
 
 // ── Push helpers ──────────────────────────────────────────────────
-async function push(patch) {
-  isSyncing = true;
-  await pushState(ROOM, { ...patch, updatedBy: 'remote' });
-  isSyncing = false;
+function push(patch) {
+  return pushState(ROOM, { ...patch, updatedBy: 'remote' });
 }
 
-async function pushStyle(key, val) {
-  isSyncing = true;
-  await pushState(ROOM, { style: { [key]: val }, updatedBy: 'remote' });
-  isSyncing = false;
+function pushStyle(key, val) {
+  return pushState(ROOM, { style: { [key]: val }, updatedBy: 'remote' });
 }
 
 // ── Play / Pause ──────────────────────────────────────────────────
@@ -123,13 +118,18 @@ function setSpeed(v) {
 }
 
 speedSlider.addEventListener('input', () => setSpeed(+speedSlider.value));
+// nudge-btn flanking the slider
+document.getElementById('speed-down').addEventListener('click', () => setSpeed(state.speed - 5));
+document.getElementById('speed-up').addEventListener('click',   () => setSpeed(state.speed + 5));
+// precision grid
 document.getElementById('speed-m5').addEventListener('click', () => setSpeed(state.speed - 5));
 document.getElementById('speed-m1').addEventListener('click', () => setSpeed(state.speed - 1));
 document.getElementById('speed-p1').addEventListener('click', () => setSpeed(state.speed + 1));
 document.getElementById('speed-p5').addEventListener('click', () => setSpeed(state.speed + 5));
 
 document.getElementById('restart-btn').addEventListener('click', () => {
-  push({ position: 0, playing: false, manualVelocity: 0 });
+  const ts = Date.now();
+  push({ position: 0, seekTimestamp: ts, playing: false, manualVelocity: 0 });
   state.playing = false;
   state.position = 0;
   updatePlayBtn(false);
@@ -221,7 +221,7 @@ posSlider.addEventListener('input', () => {
   const v = +posSlider.value;
   posVal.textContent = v + '%';
   state.position = v;
-  push({ position: v, playing: false, manualVelocity: 0 });
+  push({ position: v, seekTimestamp: Date.now(), playing: false, manualVelocity: 0 });
 });
 
 document.getElementById('pos-m10').addEventListener('click',  () => nudgePos(-10));
@@ -232,13 +232,13 @@ document.getElementById('pos-restart').addEventListener('click', () => {
   posSlider.value = 0;
   posVal.textContent = '0%';
   state.position = 0;
-  push({ position: 0, manualVelocity: 0 });
+  push({ position: 0, seekTimestamp: Date.now(), manualVelocity: 0 });
 });
 document.getElementById('pos-end').addEventListener('click', () => {
   posSlider.value = 100;
   posVal.textContent = '100%';
   state.position = 100;
-  push({ position: 100, manualVelocity: 0 });
+  push({ position: 100, seekTimestamp: Date.now(), manualVelocity: 0 });
 });
 
 function nudgePos(delta) {
@@ -246,7 +246,7 @@ function nudgePos(delta) {
   state.position = v;
   posSlider.value = v;
   posVal.textContent = v + '%';
-  push({ position: v, manualVelocity: 0 });
+  push({ position: v, seekTimestamp: Date.now(), manualVelocity: 0 });
 }
 
 // ── Slides ────────────────────────────────────────────────────────
@@ -405,5 +405,5 @@ speedLbl.textContent = speedLabel(DEFAULT_STATE.speed);
 watchState(ROOM, incoming => {
   if (!incoming) { setStatus(false); return; }
   setStatus(true);
-  if (!isSyncing) applyStateToUI(incoming);
+  applyStateToUI(incoming);
 });

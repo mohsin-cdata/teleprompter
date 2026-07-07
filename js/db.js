@@ -36,6 +36,7 @@ export const DEFAULT_STATE = {
   position: 0,           // scroll percentage 0-100
   slide: 0,              // current section index (slide mode)
   manualVelocity: 0,     // -1 = scroll up, 0 = stop, 1 = scroll down (D-pad)
+  seekTimestamp: 0,      // changes only on explicit position seeks (slider/buttons), never D-pad
   updatedBy: 'remote',
   style: {
     fontSize: 36,

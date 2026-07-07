@@ -34,8 +34,8 @@ let currentMode  = DEFAULT_STATE.mode;
 let currentSlide = 0;
 let sections = [];
 let totalSections = 0;
-let remotePositionPending = null;
 let lastPositionReport = 0;
+let lastSeekTs = 0;        // tracks last seekTimestamp we applied
 
 // D-pad manual velocity scroll
 let manualVel = 0;
@@ -51,11 +51,6 @@ function scrollStep(ts) {
   if (lastTs === null) lastTs = ts;
   const dt = Math.min(ts - lastTs, 100); // cap delta to avoid jumps after tab switch
   lastTs = ts;
-
-  if (remotePositionPending !== null) {
-    seekToPercent(remotePositionPending);
-    remotePositionPending = null;
-  }
 
   window.scrollBy(0, pxPerMs(currentSpeed) * dt);
   updateProgress();
@@ -164,52 +159,45 @@ function goToSlide(idx) {
 }
 
 // ── Apply state from Firebase ────────────────────────────────────
-function applyState(state) {
-  if (!state) return;
+function applyState(s) {
+  if (!s) return;
 
   const wasPlaying = isPlaying;
-  isPlaying = state.playing;
-  currentSpeed = state.speed || 35;
-  currentMode  = state.mode  || 'auto';
-  currentSlide = state.slide || 0;
+  isPlaying   = s.playing;
+  currentSpeed = s.speed || 35;
+  currentMode  = s.mode  || 'auto';
+  currentSlide = s.slide || 0;
 
-  // D-pad velocity (manual mode)
-  if (state.manualVelocity !== undefined && currentMode === 'manual') {
-    applyManualVelocity(state.manualVelocity);
+  // D-pad velocity — only active in manual mode
+  if (currentMode === 'manual' && s.manualVelocity !== undefined) {
+    applyManualVelocity(s.manualVelocity);
+  } else if (currentMode !== 'manual') {
+    applyManualVelocity(0); // stop D-pad scroll if mode switched away
   }
 
-  // Seek only when remote explicitly changes position
-  if (state.updatedBy === 'remote' && state.position !== undefined) {
-    if (currentMode === 'manual') {
-      remotePositionPending = state.position;
-    }
+  // Explicit position seek — only fires when seekTimestamp changes.
+  // seekTimestamp is set ONLY by slider / nudge buttons on the remote,
+  // never by D-pad velocity pushes. This prevents snap-back on D-pad release.
+  if (s.seekTimestamp && s.seekTimestamp !== lastSeekTs && currentMode === 'manual') {
+    lastSeekTs = s.seekTimestamp;
+    requestAnimationFrame(() => {
+      seekToPercent(s.position || 0);
+      updateProgress();
+    });
   }
 
   // Slide mode
   document.body.className = `is-prompter${currentMode === 'slide' ? ' mode-slide' : ''}`;
-  if (currentMode === 'slide') {
-    goToSlide(currentSlide);
-  }
+  if (currentMode === 'slide') goToSlide(currentSlide);
 
-  // Playback
+  // Auto-scroll playback
   if (isPlaying && currentMode === 'auto') {
     if (!wasPlaying) startScroll();
   } else {
     stopScroll();
-    if (state.updatedBy === 'remote' && currentMode === 'manual' && state.position !== undefined) {
-      remotePositionPending = state.position;
-      // Force one frame to apply seek
-      requestAnimationFrame(() => {
-        if (remotePositionPending !== null) {
-          seekToPercent(remotePositionPending);
-          remotePositionPending = null;
-          updateProgress();
-        }
-      });
-    }
   }
 
-  applyStyle(state.style || DEFAULT_STATE.style);
+  applyStyle(s.style || DEFAULT_STATE.style);
   updateProgress();
 }
 
