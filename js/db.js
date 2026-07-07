@@ -31,10 +31,11 @@ export function initDB() {
 
 export const DEFAULT_STATE = {
   playing: false,
-  mode: 'auto',       // 'auto' | 'manual' | 'slide'
-  speed: 35,          // 1-100
-  position: 0,        // scroll percentage 0-100
-  slide: 0,           // current section index (slide mode)
+  mode: 'auto',          // 'auto' | 'manual' | 'slide'
+  speed: 35,             // 1-100
+  position: 0,           // scroll percentage 0-100
+  slide: 0,              // current section index (slide mode)
+  manualVelocity: 0,     // -1 = scroll up, 0 = stop, 1 = scroll down (D-pad)
   updatedBy: 'remote',
   style: {
     fontSize: 36,

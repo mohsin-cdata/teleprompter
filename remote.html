@@ -21,7 +21,8 @@
     <span class="status-dot" id="status-dot"></span>
     <span id="status-text">Connecting</span>
   </span>
-  <a href="index.html" style="margin-left:auto;font-size:12px;color:var(--text-muted);">&#8592; Setup</a>
+  <button id="theme-toggle" class="theme-toggle-btn" title="Toggle theme" aria-label="Toggle light/dark">&#9788;</button>
+  <a href="index.html" style="font-size:12px;color:var(--text-muted);">&#8592; Setup</a>
 </div>
 
 <!-- Play / Pause -->
@@ -61,22 +62,49 @@
     <div class="card-body" id="speed-body">
       <div class="slider-row">
         <div class="slider-row-label">
-          <span>Scroll Speed</span>
+          <span>Scroll Speed <span class="speed-label" id="speed-label">Medium</span></span>
           <span class="val" id="speed-val">35</span>
         </div>
         <div class="slider-with-btns">
-          <button class="nudge-btn" id="speed-down">&#8722;</button>
-          <input type="range" id="speed-slider" min="1" max="100" value="35">
-          <button class="nudge-btn" id="speed-up">+</button>
+          <button class="nudge-btn" id="speed-down" title="&minus;5">&#8722;</button>
+          <input type="range" id="speed-slider" min="1" max="100" value="35" step="1">
+          <button class="nudge-btn" id="speed-up" title="+5">+</button>
         </div>
       </div>
-
-      <!-- Precision nudge during playback -->
-      <div id="precision-row" style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn-small" id="slower-btn" style="flex:1;min-height:44px;">&#9665; Slower</button>
-        <button class="btn-small" id="faster-btn" style="flex:1;min-height:44px;">Faster &#9655;</button>
-        <button class="btn-small" id="restart-btn" style="flex:1;min-height:44px;">&#8635; Restart</button>
+      <!-- Fine precision row -->
+      <div class="precision-grid">
+        <button class="prec-btn" id="speed-m5">&minus;5</button>
+        <button class="prec-btn" id="speed-m1">&minus;1</button>
+        <button class="prec-btn active-mid" id="restart-btn">&#8635; Top</button>
+        <button class="prec-btn" id="speed-p1">+1</button>
+        <button class="prec-btn" id="speed-p5">+5</button>
       </div>
+    </div>
+  </div>
+
+  <!-- D-pad (manual mode only) -->
+  <div class="card hidden" id="card-dpad">
+    <div class="card-header" data-toggle="dpad-body">
+      <h3>D-Pad Control <span style="font-size:11px;font-weight:400;color:var(--text-muted);">hold to scroll</span></h3>
+      <span class="chevron">&#8250;</span>
+    </div>
+    <div class="card-body" id="dpad-body">
+      <div class="dpad" id="dpad">
+        <div class="dpad-corner"></div>
+        <button class="dpad-btn" id="dpad-up">&#9650;</button>
+        <div class="dpad-corner"></div>
+
+        <button class="dpad-btn dpad-side" id="dpad-left">&#9664;</button>
+        <div class="dpad-center">
+          <span class="dpad-center-dot"></span>
+        </div>
+        <button class="dpad-btn dpad-side" id="dpad-right">&#9654;</button>
+
+        <div class="dpad-corner"></div>
+        <button class="dpad-btn" id="dpad-down">&#9660;</button>
+        <div class="dpad-corner"></div>
+      </div>
+      <p class="dpad-hint">Hold &#9650;&#9660; to scroll &nbsp;&bull;&nbsp; Tap &#9664;&#9654; to jump &plusmn;10%</p>
     </div>
   </div>
 
@@ -92,16 +120,17 @@
           <span>Position</span>
           <span class="val" id="position-val">0%</span>
         </div>
-        <div class="slider-with-btns">
-          <button class="nudge-btn" id="pos-back">&laquo;</button>
-          <input type="range" id="position-slider" min="0" max="100" value="0">
-          <button class="nudge-btn" id="pos-fwd">&raquo;</button>
-        </div>
+        <input type="range" id="position-slider" min="0" max="100" value="0" step="1">
       </div>
-      <div style="display:flex;gap:10px;">
-        <button class="btn-small" id="pos-restart" style="flex:1;min-height:44px;">&#8635; Top</button>
-        <button class="btn-small" id="pos-end" style="flex:1;min-height:44px;">Bottom &#8595;</button>
+      <!-- Fine precision row -->
+      <div class="precision-grid">
+        <button class="prec-btn" id="pos-m10">&minus;10%</button>
+        <button class="prec-btn" id="pos-back">&minus;1%</button>
+        <button class="prec-btn active-mid" id="pos-restart">&#8635; Top</button>
+        <button class="prec-btn" id="pos-fwd">+1%</button>
+        <button class="prec-btn" id="pos-p10">+10%</button>
       </div>
+      <button class="btn-small" id="pos-end" style="width:100%;min-height:44px;margin-top:8px;">Go to Bottom &#8595;</button>
     </div>
   </div>
 
@@ -126,27 +155,38 @@
   <!-- Font Size -->
   <div class="card">
     <div class="card-header" data-toggle="font-body">
-      <h3>Font Size</h3>
+      <h3>Font Size &amp; Spacing</h3>
       <span class="chevron">&#8250;</span>
     </div>
     <div class="card-body" id="font-body">
       <div class="slider-row">
         <div class="slider-row-label">
-          <span>Size</span>
+          <span>Font Size</span>
           <span class="val" id="size-val">36px</span>
         </div>
         <div class="slider-with-btns">
-          <button class="nudge-btn" id="size-down">A&#8722;</button>
-          <input type="range" id="size-slider" min="18" max="90" value="36" step="2">
+          <button class="nudge-btn" id="size-down">A&minus;</button>
+          <input type="range" id="size-slider" min="18" max="90" value="36" step="1">
           <button class="nudge-btn" id="size-up">A+</button>
         </div>
       </div>
-      <div class="slider-row">
+      <div class="precision-grid" style="grid-template-columns:repeat(4,1fr);">
+        <button class="prec-btn" id="size-m4">&minus;4px</button>
+        <button class="prec-btn" id="size-m1">&minus;1px</button>
+        <button class="prec-btn" id="size-p1">+1px</button>
+        <button class="prec-btn" id="size-p4">+4px</button>
+      </div>
+
+      <div class="slider-row" style="margin-top:12px;">
         <div class="slider-row-label">
           <span>Line Height</span>
-          <span class="val" id="lh-val">1.8</span>
+          <span class="val" id="lh-val">1.80</span>
         </div>
-        <input type="range" id="lh-slider" min="1.2" max="2.8" value="1.8" step="0.1">
+        <div class="slider-with-btns">
+          <button class="nudge-btn" id="lh-down">&minus;</button>
+          <input type="range" id="lh-slider" min="1.0" max="3.0" value="1.8" step="0.05">
+          <button class="nudge-btn" id="lh-up">+</button>
+        </div>
       </div>
     </div>
   </div>
@@ -184,8 +224,6 @@
           <input type="color" id="bg-color" value="#000000">
         </div>
       </div>
-
-      <!-- Quick presets -->
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn-small preset-btn" data-text="#ffffff" data-bg="#000000" style="flex:1;min-height:40px;background:#000;color:#fff;border:1px solid #333;">White / Black</button>
         <button class="btn-small preset-btn" data-text="#000000" data-bg="#ffffff" style="flex:1;min-height:40px;background:#fff;color:#000;">Black / White</button>

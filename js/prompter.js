@@ -34,8 +34,13 @@ let currentMode  = DEFAULT_STATE.mode;
 let currentSlide = 0;
 let sections = [];
 let totalSections = 0;
-let remotePositionPending = null; // position seek from remote
+let remotePositionPending = null;
 let lastPositionReport = 0;
+
+// D-pad manual velocity scroll
+let manualVel = 0;
+let manualRaf = null;
+let manualLastTs = null;
 
 function pxPerMs(speed) {
   // speed 1-100 → 4-220 px/sec
@@ -84,6 +89,32 @@ function stopScroll() {
 function seekToPercent(pct) {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   window.scrollTo(0, max * pct / 100);
+}
+
+// ── Manual velocity scroll (D-pad hold) ──────────────────────────
+function manualStep(ts) {
+  if (manualLastTs === null) manualLastTs = ts;
+  const dt = Math.min(ts - manualLastTs, 100);
+  manualLastTs = ts;
+
+  window.scrollBy(0, pxPerMs(currentSpeed) * dt * manualVel);
+  updateProgress();
+
+  if (manualVel !== 0) {
+    manualRaf = requestAnimationFrame(manualStep);
+  } else {
+    manualRaf = null;
+    manualLastTs = null;
+    reportPosition();
+  }
+}
+
+function applyManualVelocity(vel) {
+  manualVel = vel;
+  if (vel !== 0 && !manualRaf) {
+    manualLastTs = null;
+    manualRaf = requestAnimationFrame(manualStep);
+  }
 }
 
 function updateProgress() {
@@ -141,6 +172,11 @@ function applyState(state) {
   currentSpeed = state.speed || 35;
   currentMode  = state.mode  || 'auto';
   currentSlide = state.slide || 0;
+
+  // D-pad velocity (manual mode)
+  if (state.manualVelocity !== undefined && currentMode === 'manual') {
+    applyManualVelocity(state.manualVelocity);
+  }
 
   // Seek only when remote explicitly changes position
   if (state.updatedBy === 'remote' && state.position !== undefined) {
